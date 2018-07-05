@@ -4,7 +4,7 @@ import {closest, setPlane} from './utils'
 
 import './App.css'
 
-function randomData() {
+function randomLevel() {
   return (new Array(10))
     .fill(0)
     .map(() => ({active: true, width: Math.ceil(Math.random() * 15) + 5}))
@@ -50,7 +50,7 @@ class App extends Component {
       if (levels.some((level) => level.every((plane) => plane.active === false))) {
         level += 1
         levels = levels.filter((level) => !level.every((plane) => plane.active === false))
-        levels.push(randomData())
+        levels.push(randomLevel())
       }
     } else {
       this.setState({gameOver: true})
@@ -90,8 +90,8 @@ class App extends Component {
       gameOver: false,
       offset: Math.random() * 360,
       levels: [
-        randomData(),
-        randomData(),
+        randomLevel(),
+        randomLevel(),
       ],
       level: 1,
       score: 0
