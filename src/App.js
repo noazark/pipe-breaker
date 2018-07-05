@@ -47,9 +47,15 @@ class App extends Component {
       score += 1
       levels = setPlane(levels, c, {active:false})
 
-      if (levels.some((level) => level.every((plane) => plane.active === false))) {
+      if (levels.some((level) => level.every((plane) => !plane.active))) {
         level += 1
-        levels = levels.filter((level) => !level.every((plane) => plane.active === false))
+
+        // clean level bonus
+        if (levels[0].every((plane) => !plane.active) && levels[1].every((plane) => plane.active)) {
+          score += 10
+        }
+
+        levels = levels.filter((level) => level.some((plane) => plane.active))
         levels.push(randomLevel())
       }
     } else {
