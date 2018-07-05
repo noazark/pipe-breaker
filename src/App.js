@@ -66,7 +66,7 @@ class App extends Component {
     }
 
     // set offset for next cycle
-    offset = (offset + (Math.random() * 60) + 60) % 360
+    offset = Math.random() * 360
 
     this.setState({levels, offset, score, level})
   }
