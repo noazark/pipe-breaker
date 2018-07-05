@@ -66,7 +66,13 @@ class App extends Component {
     }
 
     // set offset for next cycle
+    const lastOffset = offset
     offset = Math.random() * 360
+
+    // protect against offsets being too close together
+    if (Math.abs(offset - lastOffset) < 30) {
+      offset = lastOffset + 30
+    }
 
     this.setState({levels, offset, score, level})
   }
