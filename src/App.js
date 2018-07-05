@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {VictoryPie, Circle, VictoryAnimation} from 'victory'
 import {closest, setPlane} from './utils'
+import TouchControl from './TouchControl'
 
 import './App.css'
 
@@ -16,15 +17,11 @@ class App extends Component {
 
     this.loop = this.loop.bind(this)
     this.reset = this.reset.bind(this)
-    this.onTouchStart = this.onTouchStart.bind(this)
-    this.onTouchMove = this.onTouchMove.bind(this)
-    this.onTouchEnd = this.onTouchEnd.bind(this)
 
     this.loopID = null
 
     this.state = {
       x: 0,
-      oxset: 0,
       offset: 0,
       levels: [],
       gameOver: false,
@@ -60,7 +57,6 @@ class App extends Component {
       }
     } else {
       this.setState({gameOver: true})
-      this.disableTouch()
       clearInterval(this.loopID)
       return
     }
@@ -75,18 +71,6 @@ class App extends Component {
     }
 
     this.setState({levels, offset, score, level})
-  }
-
-  enableTouch() {
-    document.addEventListener('touchstart', this.onTouchStart, { passive: true })
-    document.addEventListener('touchend', this.onTouchEnd, { passive: true })
-    document.addEventListener('touchmove', this.onTouchMove, { passive: true })
-  }
-
-  disableTouch() {
-    document.removeEventListener('touchstart', this.onTouchStart)
-    document.removeEventListener('touchend', this.onTouchEnd)
-    document.removeEventListener('touchmove', this.onTouchMove)
   }
 
   reset() {
@@ -108,34 +92,10 @@ class App extends Component {
       level: 1,
       score: 0
     })
-    this.enableTouch()
   }
 
   componentDidMount() {
     this.reset()
-  }
-
-  componentWillUnmount() {
-    this.disableTouch()
-  }
-
-  onTouchStart(e) {
-    const rotation = -Math.atan2(e.touches[0].pageY - 333.5, e.touches[0].pageX - 187.5) * 180*4 / Math.PI;
-
-    this.setState({oxset: this.state.oxset - rotation})
-    this.onTouchMove(e)
-  }
-
-  onTouchEnd(e) {
-    this.setState({oxset: this.state.x})
-  }
-
-  onTouchMove(e) {
-    const rotation = -Math.atan2(e.touches[0].pageY - 333.5, e.touches[0].pageX - 187.5) * 180*4 / Math.PI;
-
-    this.setState({
-      x: rotation + this.state.oxset
-    })
   }
 
   render() {
@@ -219,6 +179,8 @@ class App extends Component {
           <br/>
           {this.state.score}
         </div>
+
+        <TouchControl disabled={this.state.gameOver} onChange={(x) => this.setState({x})}></TouchControl>
       </div>
     )
   }
