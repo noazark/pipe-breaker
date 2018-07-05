@@ -9,6 +9,7 @@ set -o errexit
 set -o pipefail
 
 git config --global user.email "noah@batteredoats.com"
+git config --global user.name "Noah H. Smith"
 
 git checkout -b deploy
 git add --all --force ./build/
