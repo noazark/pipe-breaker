@@ -78,6 +78,10 @@ class App extends Component {
   }
 
   reset() {
+    if (this.loopID) {
+      clearInterval(this.loopID)
+    }
+
     this.loopID = setInterval(() => this.loop(), 1000)
 
     this.setState({
