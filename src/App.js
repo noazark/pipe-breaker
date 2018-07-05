@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import {VictoryPie, Circle, VictoryAnimation} from 'victory'
+import {Circle, VictoryAnimation} from 'victory'
 import {closest, setPlane} from './utils'
 import TouchControl from './TouchControl'
+import Levels from './Levels'
 
 import './App.css'
 
@@ -100,78 +101,48 @@ class App extends Component {
 
   render() {
     const width = 375
-    const ringWidth = 50
-    const centerRadius = 50
-
-    const group = <g className="c" mask="url(#level-mask)" transform={`rotate(${-this.state.x}, ${width / 2}, ${width / 2})`} />
+    const outerRadius = 100
+    const innerRadius = 50
+    const cursorRadius = 10
+    const borderWidth = 2.5
 
     return (
       <div id="page">
         <div id="game">
           <svg width={width} height={width}>
-            <defs>
-              <mask id="level-mask">
-                {this.state.levels.map((level, i) =>
-                  <VictoryPie
-                    className="level-mask"
-                    key={i}
-                    width={250} height={250}
-                    origin={{x: width / 2, y: width / 2}}
-                    labels={() => null}
-                    standalone={false}
-                    innerRadius={(this.state.levels.length - i - 1) * ringWidth + centerRadius}
-                    data={level.map(p => p.width)}
-                    style={{
-                      data: {
-                        fill: 'white', stroke: "black", strokeWidth: 2
-                      }
-                    }}
-                  />
-                )}
-              </mask>
-            </defs>
-
-            {this.state.levels.map((level, i) =>
-              <VictoryPie
-                className="level"
-                key={i}
-                groupComponent={group}
-                width={250} height={250}
-                origin={{x: width / 2, y: width / 2}}
-                labels={() => null}
-                standalone={false}
-                innerRadius={(this.state.levels.length - i - 1) * ringWidth + centerRadius}
-                data={level.map(p => p.width)}
-                colorScale={level.map(p => p.active ? 'black' : 'none')}
+            <g transform={`translate(${width / 2}, ${width / 2})`}>
+              <Levels
+                data={this.state.levels}
+                outerRadius={outerRadius}
+                innerRadius={innerRadius}
+                rotation={this.state.x}
                 style={{
-                  data: {
-                    stroke: "none"
-                  }
+                  strokeWidth: borderWidth
                 }}
               />
-            )}
 
-            <Circle
-              events={{
-                onClick: this.reset
-              }}
-              className="top"
-              mask="url(#level-mask)"
-              cx={width / 2} cy={width / 2} r={ringWidth}
-              style={{
-                fill: this.state.gameOver? 'red': 'black',
-                strokeWidth: 2,
-                stroke: 'white'
-              }}
-            />
+              <Circle
+                events={{
+                  onClick: this.reset
+                }}
+                className="top"
+                mask="url(#level-mask)"
+                r={innerRadius}
+                style={{
+                  fill: this.state.gameOver? 'red': 'black',
+                  strokeWidth: borderWidth,
+                  stroke: 'white'
+                }}
+              />
 
-            <VictoryAnimation duration={300} easing="polyOut" data={{offset: this.state.offset}}>
-              {(data) => (
-                <g transform={`translate(0, -${this.state.levels.length * ringWidth + 10 + 2}) rotate(${data.offset}, ${width / 2}, ${width / 2 + (this.state.levels.length * ringWidth + 10 + 2)})`}>
-                  <Circle className="cursor" cx={width / 2} cy={width / 2} r={10} style={{fill: 'black'}}/>
-                </g>
-              )}
-            </VictoryAnimation>
+              <VictoryAnimation duration={300} easing="polyOut" data={{offset: this.state.offset}}>
+                {(data) => (
+                  <g transform={`translate(0, -${outerRadius + cursorRadius + borderWidth}) rotate(${data.offset}, ${0}, ${outerRadius + cursorRadius + borderWidth})`}>
+                    <Circle className="cursor" r={cursorRadius} style={{fill: 'black'}}/>
+                  </g>
+                )}
+              </VictoryAnimation>
+            </g>
           </svg>
         </div>
         <div id="score">
