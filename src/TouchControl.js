@@ -12,7 +12,7 @@ export default class extends Component {
     this.centerY = 333.5
 
     this.state = {
-      oxset: 0
+      lastValue: 0
     }
   }
 
@@ -29,7 +29,9 @@ export default class extends Component {
   }
 
   componentDidMount() {
-    this.enableTouch()
+    if (!this.props.disabled) {
+      this.enableTouch()
+    }
   }
 
   componentWillUnmount() {
@@ -39,6 +41,8 @@ export default class extends Component {
   componentWillUpdate(nextProps) {
     if (!this.props.disabled && nextProps.disabled) {
       this.disableTouch()
+    } else if (this.props.disabled && !nextProps.disabled) {
+      this.enableTouch()
     }
   }
 
@@ -47,18 +51,17 @@ export default class extends Component {
   }
 
   onTouchStart(e) {
-    const rotation = this.getRotation(e)
-    this.setState({oxset: this.state.oxset - rotation})
+    const value = this.getRotation(e)
+    this.setState({lastValue: this.state.lastValue - value})
   }
 
   onTouchEnd(e) {
-    this.setState({oxset: this.state.x})
+    this.setState({lastValue: this.props.value})
   }
 
   onTouchMove(e) {
-    const rotation = this.getRotation(e)
-
-    this.props.onChange(rotation + this.state.oxset)
+    const value = this.getRotation(e)
+    this.props.onChange(value + this.state.lastValue)
   }
 
   render () {

@@ -18,6 +18,8 @@ class App extends Component {
 
     this.loop = this.loop.bind(this)
     this.reset = this.reset.bind(this)
+    this.pause = this.pause.bind(this)
+    this.play = this.play.bind(this)
 
     this.loopID = null
 
@@ -26,6 +28,7 @@ class App extends Component {
       offset: 0,
       levels: [],
       gameOver: false,
+      paused: true,
       score: 0,
       level: 1
     }
@@ -75,16 +78,11 @@ class App extends Component {
   }
 
   reset() {
-    if (this.loopID) {
-      clearInterval(this.loopID)
-    }
-
-    this.loopID = setInterval(() => this.loop(), 1000)
-
     this.setState({
       x: 0,
       oxset: 0,
       gameOver: false,
+      paused: true,
       offset: Math.random() * 360,
       levels: [
         randomLevel(),
@@ -93,6 +91,24 @@ class App extends Component {
       level: 1,
       score: 0
     })
+  }
+
+  pause () {
+    this.setState({paused: true})
+
+    if (this.loopID) {
+      clearInterval(this.loopID)
+    }
+  }
+
+  play () {
+    this.setState({paused: false})
+
+    if (this.loopID) {
+      clearInterval(this.loopID)
+    }
+
+    this.loopID = setInterval(() => this.loop(), 1000)
   }
 
   componentDidMount() {
@@ -109,49 +125,58 @@ class App extends Component {
     return (
       <div id="page">
         <div id="game">
-          <svg width={width} height={width}>
-            <g transform={`translate(${width / 2}, ${width / 2})`}>
-              <Levels
-                data={this.state.levels}
-                outerRadius={outerRadius}
-                innerRadius={innerRadius}
-                rotation={this.state.x}
-                style={{
-                  strokeWidth: borderWidth
-                }}
-              />
+          <div id="board">
+            <svg width={width} height={width}>
+              <g transform={`translate(${width / 2}, ${width / 2})`}>
+                <Levels
+                  data={this.state.levels}
+                  outerRadius={outerRadius}
+                  innerRadius={innerRadius}
+                  rotation={this.state.x}
+                  style={{
+                    strokeWidth: borderWidth
+                  }}
+                />
 
-              <Circle
-                events={{
-                  onClick: this.reset
-                }}
-                className="top"
-                mask="url(#level-mask)"
-                r={innerRadius}
-                style={{
-                  fill: this.state.gameOver? 'red': 'black',
-                  strokeWidth: borderWidth,
-                  stroke: 'white'
-                }}
-              />
+                <Circle
+                  events={{
+                    onClick: this.reset
+                  }}
+                  className="top"
+                  mask="url(#level-mask)"
+                  r={innerRadius}
+                  style={{
+                    fill: this.state.gameOver? 'red': 'black',
+                    strokeWidth: borderWidth,
+                    stroke: 'white'
+                  }}
+                />
 
-              <VictoryAnimation duration={300} easing="polyOut" data={{offset: this.state.offset}}>
-                {(data) => (
-                  <g transform={`translate(0, -${outerRadius + cursorRadius + borderWidth}) rotate(${data.offset}, ${0}, ${outerRadius + cursorRadius + borderWidth})`}>
-                    <Circle className="cursor" r={cursorRadius} style={{fill: 'black'}}/>
-                  </g>
-                )}
-              </VictoryAnimation>
-            </g>
-          </svg>
+                <VictoryAnimation duration={300} easing="polyOut" data={{offset: this.state.offset}}>
+                  {(data) => (
+                    <g transform={`translate(0, -${outerRadius + cursorRadius + borderWidth}) rotate(${data.offset}, ${0}, ${outerRadius + cursorRadius + borderWidth})`}>
+                      <Circle className="cursor" r={cursorRadius} style={{fill: 'black'}}/>
+                    </g>
+                  )}
+                </VictoryAnimation>
+              </g>
+            </svg>
+
+            <div id="score">
+              lv. {this.state.level}
+              <br/>
+              {this.state.score}
+            </div>
+          </div>
+
+          {this.state.paused ? (
+            <button onClick={this.play}>play</button>
+          ) : (
+            <button onClick={this.pause}>pause</button>
+          )}
         </div>
-        <div id="score">
-          lv. {this.state.level}
-          <br/>
-          {this.state.score}
-        </div>
 
-        <TouchControl disabled={this.state.gameOver} onChange={(x) => this.setState({x})}></TouchControl>
+        <TouchControl disabled={this.state.gameOver || this.state.paused} value={this.state.x} onChange={(x) => this.setState({x})}></TouchControl>
       </div>
     )
   }
