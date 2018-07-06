@@ -171,6 +171,8 @@ class App extends Component {
 
           {this.state.paused ? (
             <button onClick={this.play}>play</button>
+          ) : this.state.gameOver ? (
+            <button onClick={this.reset}>restart</button>
           ) : (
             <button onClick={this.pause}>pause</button>
           )}
