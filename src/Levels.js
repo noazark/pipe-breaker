@@ -24,8 +24,8 @@ export default class extends Component {
                 innerRadius={(levelCount - i) * ringWidth + innerRadius}
                 origin={{x: 0, y: 0}}
                 labels={() => null}
-                data={level.map(p => p.width)}
-                colorScale={level.map(p => p.active ? 'white' : 'black')}
+                data={level.data.map(p => p.width)}
+                colorScale={level.data.map(p => p.active ? 'white' : 'black')}
                 style={{
                   data: {
                     ...this.props.style,

@@ -6,10 +6,16 @@ import Levels from './Levels'
 
 import './App.css'
 
-function randomLevel() {
-  return (new Array(10))
+function randomLevel(num=1) {
+  const data = (new Array(10))
     .fill(0)
     .map(() => ({active: true, width: Math.ceil(Math.random() * 15) + 5}))
+  const speed = 1 - 0.01 * (num - 1)
+
+  return {
+    speed,
+    data
+  }
 }
 
 class App extends Component {
@@ -17,11 +23,13 @@ class App extends Component {
     super(props)
 
     this.loop = this.loop.bind(this)
+    this.step = this.step.bind(this)
     this.reset = this.reset.bind(this)
     this.pause = this.pause.bind(this)
     this.play = this.play.bind(this)
 
     this.loopID = null
+    this.t = 0
 
     this.state = {
       x: 0,
@@ -35,6 +43,14 @@ class App extends Component {
   }
 
   loop() {
+    this.t += 1
+
+    if (this.t % Math.round(60 * this.state.levels[0].speed) === 0) {
+      this.step()
+    }
+  }
+
+  step() {
     let {levels, offset, score, level} = this.state
 
     let x = this.state.x + offset
@@ -48,16 +64,19 @@ class App extends Component {
       score += 1
       levels = setPlane(levels, c, {active:false})
 
-      if (levels.some((level) => level.every((plane) => !plane.active))) {
+      if (levels.some((level) => level.data.every((plane) => !plane.active))) {
+        // change levels
         level += 1
+        // reset time so the next play speed doesn't jump the screen
+        this.t = 0
 
         // clean level bonus
-        if (levels[0].every((plane) => !plane.active) && levels[1].every((plane) => plane.active)) {
+        if (levels[0].data.every((plane) => !plane.active) && levels[1].data.every((plane) => plane.active)) {
           score += 10
         }
 
-        levels = levels.filter((level) => level.some((plane) => plane.active))
-        levels.push(randomLevel())
+        levels = levels.filter((level) => level.data.some((plane) => plane.active))
+        levels.push(randomLevel(level + 1))
       }
     } else {
       this.setState({gameOver: true})
@@ -85,8 +104,8 @@ class App extends Component {
       paused: true,
       offset: Math.random() * 360,
       levels: [
-        randomLevel(),
-        randomLevel(),
+        randomLevel(1),
+        randomLevel(2),
       ],
       level: 1,
       score: 0
@@ -108,7 +127,7 @@ class App extends Component {
       clearInterval(this.loopID)
     }
 
-    this.loopID = setInterval(() => this.loop(), 1000)
+    this.loopID = setInterval(() => this.loop(), 15)
   }
 
   componentDidMount() {
