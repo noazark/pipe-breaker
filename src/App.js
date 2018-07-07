@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import classnames from 'classnames'
-import {Circle, VictoryAnimation} from 'victory'
+import {VictoryAnimation} from 'victory'
 import {closest, setPlane} from './utils'
 import TouchControl from './TouchControl'
 import Levels from './Levels'
@@ -164,7 +164,7 @@ class App extends Component {
                   padding={padding}
                 />
 
-                <Circle
+                <circle
                   events={{
                     onClick: this.reset
                   }}
@@ -179,7 +179,7 @@ class App extends Component {
                 <VictoryAnimation duration={300} easing="polyOut" data={{offset: this.state.offset || 0}}>
                   {(data) => (
                     <g transform={`translate(0, -${outerRadius + cursorRadius + padding}) rotate(${data.offset}, ${0}, ${outerRadius + cursorRadius + padding})`}>
-                      <Circle className={classnames('cursor', {'bored': this.state.paused})} r={cursorRadius} style={{fill: this.state.gameOver? 'var(--error-color)' : 'var(--pad-color)'}}/>
+                      <circle className={classnames('cursor', {'bored': this.state.paused})} r={cursorRadius} style={{fill: this.state.gameOver? 'var(--error-color)' : 'var(--pad-color)'}}/>
                     </g>
                   )}
                 </VictoryAnimation>
