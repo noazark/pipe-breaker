@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import classnames from 'classnames'
 import {Circle, VictoryAnimation} from 'victory'
 import {closest, setPlane} from './utils'
 import TouchControl from './TouchControl'
@@ -10,7 +11,7 @@ function randomLevel(num=1) {
   const data = (new Array(10))
     .fill(0)
     .map(() => ({active: true, width: Math.ceil(Math.random() * 15) + 5}))
-  const speed = 1 - 0.01 * (num - 1)
+  const speed = .01
 
   return {
     speed,
@@ -99,13 +100,13 @@ class App extends Component {
   reset() {
     this.setState({
       x: 0,
-      oxset: 0,
       gameOver: false,
       paused: true,
-      offset: Math.random() * 360,
+      offset: null,
       levels: [
-        randomLevel(1),
-        randomLevel(2),
+        {...randomLevel(1), color: 'var(--pad-color)'},
+        {...randomLevel(2), color: 'var(--pad-color)'},
+        {...randomLevel(2), color: 'var(--pad-color)'},
       ],
       level: 1,
       score: 0
@@ -121,7 +122,13 @@ class App extends Component {
   }
 
   play () {
-    this.setState({paused: false})
+    let offset = this.state.offset
+
+    if (offset == null) {
+      offset = Math.random() * 360
+    }
+
+    this.setState({paused: false, offset})
 
     if (this.loopID) {
       clearInterval(this.loopID)
@@ -135,11 +142,13 @@ class App extends Component {
   }
 
   render() {
-    const width = 375
-    const outerRadius = 100
-    const innerRadius = 50
+    const padWidth = 3
+    const innerRadius = 90
     const cursorRadius = 10
-    const borderWidth = 2.5
+    const padding = 5
+    const outerRadius = this.state.levels.length * (padWidth + padding) + innerRadius
+    // 10 == cursor animation buffer
+    const width = (outerRadius + (20 + cursorRadius) + padding) * 2
 
     return (
       <div id="page">
@@ -149,12 +158,10 @@ class App extends Component {
               <g transform={`translate(${width / 2}, ${width / 2})`}>
                 <Levels
                   data={this.state.levels}
-                  outerRadius={outerRadius}
+                  padWidth={padWidth}
                   innerRadius={innerRadius}
                   rotation={this.state.x}
-                  style={{
-                    strokeWidth: borderWidth
-                  }}
+                  padding={padding}
                 />
 
                 <Circle
@@ -165,16 +172,16 @@ class App extends Component {
                   mask="url(#level-mask)"
                   r={innerRadius}
                   style={{
-                    fill: this.state.gameOver? 'red': 'black',
-                    strokeWidth: borderWidth,
-                    stroke: 'white'
+                    fill: this.state.gameOver? 'var(--error-color)' : 'var(--pad-color)',
+                    strokeWidth: padding,
+                    stroke: 'var(--bg-color)'
                   }}
                 />
 
-                <VictoryAnimation duration={300} easing="polyOut" data={{offset: this.state.offset}}>
+                <VictoryAnimation duration={300} easing="polyOut" data={{offset: this.state.offset || 0}}>
                   {(data) => (
-                    <g transform={`translate(0, -${outerRadius + cursorRadius + borderWidth}) rotate(${data.offset}, ${0}, ${outerRadius + cursorRadius + borderWidth})`}>
-                      <Circle className="cursor" r={cursorRadius} style={{fill: 'black'}}/>
+                    <g transform={`translate(0, -${outerRadius + cursorRadius + padding}) rotate(${data.offset}, ${0}, ${outerRadius + cursorRadius + padding})`}>
+                      <Circle className={classnames('cursor', {'bored': this.state.paused})} r={cursorRadius} style={{fill: this.state.gameOver? 'var(--error-color)' : 'var(--pad-color)'}}/>
                     </g>
                   )}
                 </VictoryAnimation>
@@ -188,13 +195,16 @@ class App extends Component {
             </div>
           </div>
 
-          {this.state.paused ? (
-            <button onClick={this.play}>play</button>
-          ) : this.state.gameOver ? (
-            <button onClick={this.reset}>restart</button>
-          ) : (
-            <button onClick={this.pause}>pause</button>
-          )}
+          <div id="controls">
+            <button
+              className={
+                classnames('btn', this.state.paused ? 'btn-play' : this.state.gameOver ? 'btn-reset' : 'btn-pause')
+              }
+              onClick={this.state.paused ? this.play : this.state.gameOver ? this.reset : this.pause}
+            >
+              {this.state.paused ? 'play' : this.state.gameOver ? 'reset' : 'pause'}
+            </button>
+          </div>
         </div>
 
         <TouchControl disabled={this.state.gameOver || this.state.paused} value={this.state.x} onChange={(x) => this.setState({x})}></TouchControl>

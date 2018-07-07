@@ -5,11 +5,11 @@ export default class extends Component {
   render () {
     const {
       data,
+      padWidth,
       innerRadius,
-      outerRadius
+      padding
     } = this.props
     const levelCount = data.length
-    const ringWidth = (outerRadius - innerRadius) / levelCount
 
     return (
       <g>
@@ -20,15 +20,15 @@ export default class extends Component {
                 key={i}
                 standalone={false}
                 groupComponent={<g transform={`rotate(${-this.props.rotation})`} />}
-                width={outerRadius * 2} height={outerRadius * 2}
-                innerRadius={(levelCount - i) * ringWidth + innerRadius}
+                width={(i * (padWidth + padding) + innerRadius) * 2} height={(i * (padWidth + padding) + innerRadius) * 2}
+                innerRadius={(levelCount - i) * (padWidth + padding) + innerRadius}
                 origin={{x: 0, y: 0}}
                 labels={() => null}
                 data={level.data.map(p => p.width)}
                 colorScale={level.data.map(p => p.active ? 'white' : 'black')}
                 style={{
                   data: {
-                    ...this.props.style,
+                    strokeWidth: padding,
                     stroke: 'black'
                   }
                 }}
@@ -38,14 +38,17 @@ export default class extends Component {
         </defs>
 
         <g mask='url(#level-mask)'>
-          <Circle
-            className='top'
-            r={outerRadius}
-            style={{
-              ...this.props.style,
-              fill: 'black'
-            }}
-          />
+          {data.map((level, i) => (
+            <Circle
+              key={i}
+              className='top'
+              r={(levelCount - i) * ((padWidth + padding)+1) + innerRadius}
+              style={{
+                strokeWidth: padding,
+                fill: 'var(--pad-color)'
+              }}
+            />
+          ))}
         </g>
       </g>
     )

@@ -1,3 +1,19 @@
+:root {
+  --bg-color: #FFFFFF;
+  --control-color: #e6e6e6;
+  --pad-color: #454949;
+  --error-color: #DB4A4A;
+}
+
+#game,
+#score,
+#controls {
+  color: var(--bg-color);
+  text-align: center;
+  font-family: monospace;
+  font-size: 16px;
+}
+
 #game,
 #score {
   position: absolute;
@@ -8,10 +24,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-evenly;
 }
 
 #game {
+  transition-property: background-color;
+  transition-duration: .3s;
+  background-color: var(--bg-color);
+}
+
+#game svg * {
+  transition-property: fill;
+  transition-duration: .3s;
 }
 
 #board {
@@ -19,10 +43,65 @@
 }
 
 #score {
-  color: white;
-  text-align: center;
-  font-family: monospace;
-  font-size: 16px;
   pointer-events: none;
   user-select: none;
+}
+
+#controls {
+  height: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+#controls .btn {
+  --radius: 25px;
+  --control-bg-color: var(--control-color);
+  --control-font-color: var(--bg-color);
+
+  padding: 0;
+  margin: 0;
+  height: calc(var(--radius) * 2);
+  width: calc(var(--radius) * 2);
+  border-radius: calc(var(--radius) * 2);
+  border: none;
+  background-color: var(--control-bg-color);
+  color: var(--control-font-color);
+  font-family: monospace;
+  font-size: 12px;
+  transition-property: all;
+  transition-duration: .1s;
+  transition-timing-function: ease-in;
+  user-select: none;
+  outline: none;
+}
+
+#controls .btn.btn-reset {
+  --control-bg-color: var(--error-color);
+  --radius: 60px;
+  font-size: 14px;
+}
+
+#controls .btn.btn-play {
+  --control-bg-color: var(--pad-color);
+  --radius: 25px;
+}
+
+.cursor.bored {
+  animation-duration: .3s;
+  animation-name: boredom;
+  animation-direction: alternate-reverse;
+  animation-iteration-count: infinite;
+  animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+}
+
+@keyframes boredom {
+  from {
+    transform: translateY(5px);
+  }
+
+  to {
+    transform: translateY(-10px);
+  }
 }
