@@ -11,7 +11,7 @@ function randomLevel(num=1) {
   const data = (new Array(10))
     .fill(0)
     .map(() => ({active: true, width: Math.ceil(Math.random() * 15) + 5}))
-  const speed = .01
+  const speed = 1
 
   return {
     speed,
@@ -142,9 +142,9 @@ class App extends Component {
   }
 
   render() {
-    const padWidth = 3
     const innerRadius = 90
     const cursorRadius = 10
+    const padWidth = 5
     const padding = 5
     const outerRadius = this.state.levels.length * (padWidth + padding) + innerRadius
     // 10 == cursor animation buffer
@@ -173,8 +173,6 @@ class App extends Component {
                   r={innerRadius}
                   style={{
                     fill: this.state.gameOver? 'var(--error-color)' : 'var(--pad-color)',
-                    strokeWidth: padding,
-                    stroke: 'var(--bg-color)'
                   }}
                 />
 
