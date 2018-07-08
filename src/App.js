@@ -33,7 +33,7 @@ class App extends Component {
     this.t = 0
 
     this.state = {
-      x: 0,
+      rotation: 0,
       offset: 0,
       levels: [],
       gameOver: false,
@@ -54,12 +54,12 @@ class App extends Component {
   step() {
     let {levels, offset, score, level} = this.state
 
-    let x = this.state.x + offset
+    let rotation = this.state.rotation + offset
 
-    if (x < 0) {
-      x = 360 + (x % 360)
+    if (rotation < 0) {
+      rotation = 360 + (rotation % 360)
     }
-    const c = closest(levels, x / 360 % 1)
+    const c = closest(levels, rotation / 360 % 1)
 
     if (c[0] !== -1) {
       score += 1
@@ -99,7 +99,7 @@ class App extends Component {
 
   reset() {
     this.setState({
-      x: 0,
+      rotation: 0,
       gameOver: false,
       paused: true,
       offset: null,
@@ -156,7 +156,7 @@ class App extends Component {
           <div id="board">
             <svg width={width} height={width}>
               <g transform={`translate(${width / 2}, ${width / 2})`}>
-                <g transform={`rotate(${-this.state.x})`}>
+                <g transform={`rotate(${-this.state.rotation})`}>
                   <Levels
                     data={this.state.levels}
                     padWidth={padWidth}
@@ -204,7 +204,7 @@ class App extends Component {
           </div>
         </div>
 
-        <TouchControl disabled={this.state.gameOver || this.state.paused} value={this.state.x} onChange={(x) => this.setState({x})}></TouchControl>
+        <TouchControl disabled={this.state.gameOver || this.state.paused} value={this.state.rotation} onChange={(rotation) => this.setState({rotation})}></TouchControl>
       </div>
     )
   }
