@@ -165,9 +165,7 @@ class App extends Component {
                 />
 
                 <circle
-                  events={{
-                    onClick: this.reset
-                  }}
+                  onClick={this.reset}
                   className="top"
                   mask="url(#level-mask)"
                   r={innerRadius}
