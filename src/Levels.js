@@ -10,6 +10,7 @@ export default class Levels extends Component {
       padding,
       rotation
     } = this.props
+
     const levelCount = data.length
 
     return data.map((level, i) => (
@@ -19,7 +20,7 @@ export default class Levels extends Component {
         level={level}
         padWidth={padWidth}
         padding={padding}
-        innerRadius={(levelCount - i) * (padWidth + padding) + innerRadius}
+        innerRadius={(levelCount - i) * (padWidth + padding) + innerRadius - padding}
       />
     ))
   }
