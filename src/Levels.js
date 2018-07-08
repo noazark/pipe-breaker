@@ -7,15 +7,13 @@ export default class Levels extends Component {
       data,
       padWidth,
       innerRadius,
-      padding,
-      rotation
+      padding
     } = this.props
 
     const levelCount = data.length
 
     return data.map((level, i) => (
       <Level
-        transform={`rotate(${-rotation})`}
         key={i}
         level={level}
         padWidth={padWidth}

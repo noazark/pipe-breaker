@@ -156,13 +156,14 @@ class App extends Component {
           <div id="board">
             <svg width={width} height={width}>
               <g transform={`translate(${width / 2}, ${width / 2})`}>
-                <Levels
-                  data={this.state.levels}
-                  padWidth={padWidth}
-                  innerRadius={innerRadius}
-                  rotation={this.state.x}
-                  padding={padding}
-                />
+                <g transform={`rotate(${-this.state.x})`}>
+                  <Levels
+                    data={this.state.levels}
+                    padWidth={padWidth}
+                    innerRadius={innerRadius}
+                    padding={padding}
+                  />
+                </g>
 
                 <circle
                   onClick={this.reset}
@@ -181,7 +182,6 @@ class App extends Component {
                     </g>
                   )}
                 </Motion>
-
               </g>
             </svg>
 
