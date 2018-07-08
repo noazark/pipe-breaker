@@ -16,5 +16,5 @@ export default function Pad (props) {
   const endAngle = 360 * findEndPos(level, idx)
   const path = describeArc(innerRadius, outerRadius, startAngle, endAngle, padding)
 
-  return pad.active ? <path className=".pad" d={path} /> : null
+  return pad.active ? <path className=".pad" d={path} fill="var(--pad-color)" /> : null
 }

@@ -13,14 +13,17 @@ function randomLevel(pads=10, min=5, max=15) {
 }
 
 var levels = [
-  [3, 2, 3, 2],
-  [4, 4, 3, 3, 4],
-  [2, 4, 3, 3, 2],
-  [3, 2, 4, 2, 4],
-  [3, 2, 2, 4, 2]
+  [{width:3, color: '#333'}, {width:8, color: '#efefef'}, {width:3, color: '#efefef'}, {width:2, color: '#333'}],
+  [{width:4, color: '#efefef'}, {width:4, color: '#333'}, {width:3, color: '#efefef'}, {width:1.5, color: '#333'}, {width: 4, color: '#333'}],
+  [{width:2, color: '#efefef'}, {width:4, color: '#efefef'}, {width:3, color: '#efefef'}, {width:3, color: '#efefef'}, {width: 2, color: '#efefef'}],
+  [{width:3, color: '#efefef'}, {width:2, color: '#efefef'}, {width:4, color: '#efefef'}, {width:2, color: '#efefef'}, {width: 4, color: '#efefef'}],
+  [{width:3, color: '#efefef'}, {width:2, color: '#efefef'}, {width:2, color: '#efefef'}, {width:4, color: '#efefef'}, {width: 2, color: '#efefef'}]
 ]
 
 console.log(levels);
+
+this.fillStyle = 'white';
+this.fillRect(0,0,this.width,this.height);
 
 drawShell(this, centerX, centerY, innerRadius, 2);
 this.fillStyle = '#DB4A4A';
@@ -30,7 +33,7 @@ levels.forEach((level, l) => {
     const ir = innerRadius + padWidth + (2 * padWidth * l)
     level.forEach((pad, i) => {
         drawPad(this, centerX, centerY, ir, padWidth, findStartPos(level, i), findEndPos(level, i));
-        this.fillStyle = '#333';
+        this.fillStyle = pad.color;
         this.fill();
     })
 })
@@ -54,7 +57,7 @@ function drawPad(ctx, x, y, innerRadius, padWidth, start, end) {
 }
 
 function sum(arr) {
-  return arr.reduce((agg, p) => agg + p, 0)
+  return arr.reduce((agg, p) => agg + p.width, 0)
 }
 
 function findStartPos(level, i) {

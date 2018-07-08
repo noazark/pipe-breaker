@@ -5,6 +5,10 @@
   --error-color: #DB4A4A;
 }
 
+* {
+  user-select: none;
+}
+
 #game,
 #score,
 #controls {
