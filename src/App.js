@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import classnames from 'classnames'
-import {VictoryAnimation} from 'victory'
 import {closest, setPlane} from './utils'
 import TouchControl from './TouchControl'
 import Levels from './Levels'
+import {Motion, spring} from 'react-motion'
 
 import './App.css'
 
@@ -176,13 +176,14 @@ class App extends Component {
                   }}
                 />
 
-                <VictoryAnimation duration={300} easing="polyOut" data={{offset: this.state.offset || 0}}>
-                  {(data) => (
-                    <g transform={`translate(0, -${outerRadius + cursorRadius + padding}) rotate(${data.offset}, ${0}, ${outerRadius + cursorRadius + padding})`}>
+                <Motion defaultStyle={{offset: 10}} style={{offset: spring(this.state.offset)}}>
+                  {({offset}) => (
+                    <g transform={`translate(0, -${outerRadius + cursorRadius + padding}) rotate(${offset}, ${0}, ${outerRadius + cursorRadius + padding})`}>
                       <circle className={classnames('cursor', {'bored': this.state.paused})} r={cursorRadius} style={{fill: this.state.gameOver? 'var(--error-color)' : 'var(--pad-color)'}}/>
                     </g>
                   )}
-                </VictoryAnimation>
+                </Motion>
+
               </g>
             </svg>
 
