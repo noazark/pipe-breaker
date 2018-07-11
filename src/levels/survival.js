@@ -1,6 +1,6 @@
 import {closest, setPlane} from '../utils'
 
-function randomRing(num=1) {
+function randomRing() {
   const data = (new Array(10))
     .fill(0)
     .map(() => ({active: true, width: Math.ceil(Math.random() * 15) + 5}))
@@ -16,9 +16,9 @@ export default {
       rotation: 0,
       offset: null,
       rings: [
-        {...randomRing(1), color: 'var(--pad-color)'},
-        {...randomRing(2), color: 'var(--pad-color)'},
-        {...randomRing(2), color: 'var(--pad-color)'},
+        {...randomRing(), color: 'var(--pad-color)'},
+        {...randomRing(), color: 'var(--pad-color)'},
+        {...randomRing(), color: 'var(--pad-color)'},
       ],
       ring: 1,
       score: 0,
