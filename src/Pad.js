@@ -3,7 +3,7 @@ import {findStartPos, findEndPos, describeArc} from './utils'
 
 export default function Pad (props) {
   const {
-    level,
+    ring,
     pad,
     idx,
     padWidth,
@@ -12,8 +12,8 @@ export default function Pad (props) {
   } = props
 
   const outerRadius = innerRadius + padWidth
-  const startAngle = 360 * findStartPos(level, idx)
-  const endAngle = 360 * findEndPos(level, idx)
+  const startAngle = 360 * findStartPos(ring, idx)
+  const endAngle = 360 * findEndPos(ring, idx)
   const path = describeArc(innerRadius, outerRadius, startAngle, endAngle, padding)
 
   return pad.active ? <path className=".pad" d={path} fill="var(--pad-color)" /> : null

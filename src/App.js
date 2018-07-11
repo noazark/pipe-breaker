@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import classnames from 'classnames'
 import {closest, setPlane} from './utils'
 import TouchControl from './TouchControl'
-import Levels from './Levels'
+import Rings from './Rings'
 import {Motion, spring} from 'react-motion'
 
 import './App.css'
 
-function randomLevel(num=1) {
+function randomRing(num=1) {
   const data = (new Array(10))
     .fill(0)
     .map(() => ({active: true, width: Math.ceil(Math.random() * 15) + 5}))
@@ -33,51 +33,54 @@ class App extends Component {
     this.t = 0
 
     this.state = {
+      // ring state
+      rings: [],
       rotation: 0,
       offset: 0,
-      levels: [],
+
+      // game state
       gameOver: false,
       paused: true,
       score: 0,
-      level: 1
+      ring: 1
     }
   }
 
   loop() {
     this.t += 1
 
-    if (this.t % Math.round(60 * this.state.levels[0].speed) === 0) {
+    if (this.t % Math.round(60 * this.state.rings[0].speed) === 0) {
       this.step()
     }
   }
 
   step() {
-    let {levels, offset, score, level} = this.state
+    let {rings, offset, score, ring} = this.state
 
     let rotation = this.state.rotation + offset
 
     if (rotation < 0) {
       rotation = 360 + (rotation % 360)
     }
-    const c = closest(levels, rotation / 360 % 1)
+    const c = closest(rings, rotation / 360 % 1)
 
     if (c[0] !== -1) {
       score += 1
-      levels = setPlane(levels, c, {active:false})
+      rings = setPlane(rings, c, {active:false})
 
-      if (levels.some((level) => level.data.every((plane) => !plane.active))) {
-        // change levels
-        level += 1
+      if (rings.some((ring) => ring.data.every((plane) => !plane.active))) {
+        // change rings
+        ring += 1
         // reset time so the next play speed doesn't jump the screen
         this.t = 0
 
-        // clean level bonus
-        if (levels[0].data.every((plane) => !plane.active) && levels[1].data.every((plane) => plane.active)) {
+        // clean ring bonus
+        if (rings[0].data.every((plane) => !plane.active) && rings[1].data.every((plane) => plane.active)) {
           score += 10
         }
 
-        levels = levels.filter((level) => level.data.some((plane) => plane.active))
-        levels.push(randomLevel(level + 1))
+        rings = rings.filter((ring) => ring.data.some((plane) => plane.active))
+        rings.push(randomRing(ring + 1))
       }
     } else {
       this.setState({gameOver: true})
@@ -94,7 +97,7 @@ class App extends Component {
       offset = lastOffset + 30
     }
 
-    this.setState({levels, offset, score, level})
+    this.setState({rings, offset, score, ring})
   }
 
   reset() {
@@ -103,12 +106,12 @@ class App extends Component {
       gameOver: false,
       paused: true,
       offset: null,
-      levels: [
-        {...randomLevel(1), color: 'var(--pad-color)'},
-        {...randomLevel(2), color: 'var(--pad-color)'},
-        {...randomLevel(2), color: 'var(--pad-color)'},
+      rings: [
+        {...randomRing(1), color: 'var(--pad-color)'},
+        {...randomRing(2), color: 'var(--pad-color)'},
+        {...randomRing(2), color: 'var(--pad-color)'},
       ],
-      level: 1,
+      ring: 1,
       score: 0
     })
   }
@@ -146,7 +149,7 @@ class App extends Component {
     const cursorRadius = 10
     const padWidth = 5
     const padding = 5
-    const outerRadius = this.state.levels.length * (padWidth + padding) + innerRadius
+    const outerRadius = this.state.rings.length * (padWidth + padding) + innerRadius
     // 10 == cursor animation buffer
     const width = (outerRadius + (20 + cursorRadius) + padding) * 2
 
@@ -157,8 +160,8 @@ class App extends Component {
             <svg width={width} height={width}>
               <g transform={`translate(${width / 2}, ${width / 2})`}>
                 <g transform={`rotate(${-this.state.rotation})`}>
-                  <Levels
-                    data={this.state.levels}
+                  <Rings
+                    data={this.state.rings}
                     padWidth={padWidth}
                     innerRadius={innerRadius}
                     padding={padding}
@@ -168,7 +171,7 @@ class App extends Component {
                 <circle
                   onClick={this.reset}
                   className="top"
-                  mask="url(#level-mask)"
+                  mask="url(#ring-mask)"
                   r={innerRadius}
                   style={{
                     fill: this.state.gameOver? 'var(--error-color)' : 'var(--pad-color)',
@@ -186,7 +189,7 @@ class App extends Component {
             </svg>
 
             <div id="score">
-              lv. {this.state.level}
+              lv. {this.state.ring}
               <br/>
               {this.state.score}
             </div>

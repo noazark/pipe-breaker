@@ -2,23 +2,23 @@ function sum(arr) {
   return arr.reduce((agg, p) => agg + p.width, 0)
 }
 
-export function findStartPos(level, i) {
-  return sum(level.data.slice(0, i)) / sum(level.data)
+export function findStartPos(ring, i) {
+  return sum(ring.data.slice(0, i)) / sum(ring.data)
 }
 
-export function findEndPos(level, i) {
-  return sum(level.data.slice(0, i + 1)) / sum(level.data)
+export function findEndPos(ring, i) {
+  return sum(ring.data.slice(0, i + 1)) / sum(ring.data)
 }
 
-export function closest(levels, pos) {
+export function closest(rings, pos) {
   let lidx, pidx;
 
-  lidx = levels.findIndex((level) => {
-    pidx = level.data.findIndex((plane, i) => {
+  lidx = rings.findIndex((ring) => {
+    pidx = ring.data.findIndex((plane, i) => {
       if (!plane.active) {
         return null
       } else {
-        return findStartPos(level, i) <= pos && findEndPos(level, i) >= pos
+        return findStartPos(ring, i) <= pos && findEndPos(ring, i) >= pos
       }
     })
 
@@ -28,15 +28,15 @@ export function closest(levels, pos) {
   return [lidx, pidx]
 }
 
-export function setPlane(levels, s, obj) {
+export function setPlane(rings, s, obj) {
   return Object.values({
-    ...levels,
+    ...rings,
     [s[0]]: {
-      ...levels[s[0]],
+      ...rings[s[0]],
       data: Object.values({
-        ...levels[s[0]].data,
+        ...rings[s[0]].data,
         [s[1]]: {
-          ...levels[s[0]].data[s[1]],
+          ...rings[s[0]].data[s[1]],
           ...obj
         }
       })

@@ -1,19 +1,19 @@
 import React from 'react'
 import Pad from './Pad'
 
-export default function Level (props) {
+export default function Ring (props) {
   const {
-    level,
+    ring,
     padWidth,
     padding,
     innerRadius
   } = props
 
   return (
-    level.data.map((pad, idx) => (
+    ring.data.map((pad, idx) => (
       <Pad
         key={idx}
-        level={level}
+        ring={ring}
         pad={pad}
         idx={idx}
         innerRadius={innerRadius}
