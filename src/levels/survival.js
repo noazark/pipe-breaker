@@ -22,55 +22,69 @@ export default {
       ],
       ring: 1,
       score: 0,
-      speed: 0,
+      speed: 1,
+      t: 0
     }
   },
 
+  rotate(r) {
+    return {rotation: r}
+  },
+
   step(ctx, state, kill=true) {
-    let {rings, offset, score, ring} = state
+    let {speed, rings, offset, score, ring, t, rotation} = state
 
-    let rotation = state.rotation + offset
-
-    if (rotation < 0) {
-      rotation = 360 + (rotation % 360)
+    if (offset == null) {
+      offset = Math.random() * 360
     }
 
-    if (kill) {
-      const c = closest(rings, rotation / 360 % 1)
+    t += 1
 
-      if (c[0] !== -1) {
-        score += 1
-        rings = setPlane(rings, c, {active:false})
+    if (t % Math.round(60 * speed) === 0) {
+      // reset timer to prevent gliches when changing speed
+      t = 0
 
-        if (rings.some((ring) => ring.data.every((plane) => !plane.active))) {
-          // change rings
-          ring += 1
+      let _r = rotation + offset
 
-          // clean ring bonus
-          if (rings[0].data.every((plane) => !plane.active) && rings[1].data.every((plane) => plane.active)) {
-            score += 10
+      if (_r < 0) {
+        _r = 360 + (_r % 360)
+      }
+
+      if (kill) {
+        const c = closest(rings, _r / 360 % 1)
+
+        if (c[0] !== -1) {
+          score += 1
+          rings = setPlane(rings, c, {active:false})
+
+          if (rings.some((ring) => ring.data.every((plane) => !plane.active))) {
+            // change rings
+            ring += 1
+
+            // clean ring bonus
+            if (rings[0].data.every((plane) => !plane.active) && rings[1].data.every((plane) => plane.active)) {
+              score += 10
+            }
+
+            rings = rings.filter((ring) => ring.data.some((plane) => plane.active))
+            rings.push(randomRing(ring + 1))
           }
-
-          rings = rings.filter((ring) => ring.data.some((plane) => plane.active))
-          rings.push(randomRing(ring + 1))
+        } else {
+          ctx.gameOver()
+          return state
         }
-      } else {
-        ctx.gameOver()
-        return
+      }
+
+      // set offset for next cycle
+      const lastOffset = offset
+      offset = Math.random() * 360
+
+      // protect against offsets being too close together
+      if (Math.abs(offset - lastOffset) < 30) {
+        offset = lastOffset + 30
       }
     }
 
-    // set offset for next cycle
-    const lastOffset = offset
-    offset = Math.random() * 360
-
-    // protect against offsets being too close together
-    if (Math.abs(offset - lastOffset) < 30) {
-      offset = lastOffset + 30
-    }
-
-    const speed = 1
-
-    return {rings, offset, score, ring, speed}
+    return {rings, offset, score, ring, speed, t, rotation}
   }
 }

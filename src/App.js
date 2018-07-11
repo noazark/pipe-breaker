@@ -17,17 +17,15 @@ class App extends Component {
     this.pause = this.pause.bind(this)
     this.play = this.play.bind(this)
     this.reset = this.reset.bind(this)
-    this.step = this.step.bind(this)
 
     this.loopID = null
     this.level = survival
 
     this.state = {
       // level state
-      ...this.level.reset(this, this.state),
+      level: this.level.reset(this, this.state),
 
       // game state
-      t: 0,
       gameOver: false,
       paused: true,
     }
@@ -41,14 +39,12 @@ class App extends Component {
   }
 
   loop() {
-    const t = this.state.t + 1
-    this.setState({t})
+    const level = this.level.step(this, this.state.level)
+    this.setState({level})
 
-    if (t % Math.round(60 * this.state.speed) === 0) {
-      this.step()
+    if (!this.state.paused) {
+      this.loopID = window.requestAnimationFrame(this.loop)
     }
-
-    this.loopID = window.requestAnimationFrame(this.loop)
   }
 
   pause () {
@@ -60,29 +56,31 @@ class App extends Component {
   }
 
   play () {
-    const state = this.level.step(this, this.state, false)
-
-    this.setState({...state, paused: false})
-
     if (this.loopID) {
       window.cancelAnimationFrame(this.loopID)
     }
 
-    this.loop()
+    this.setState({paused: false})
+    window.requestAnimationFrame(this.loop)
   }
 
   reset() {
-    const state = this.level.reset(this, this.state)
+    const level = this.level.reset(this, this.state)
     this.setState({
-      ...state,
+      level,
       gameOver: false,
       paused: true,
     })
   }
 
-  step() {
-    const state = this.level.step(this, this.state)
-    this.setState(state)
+  rotate(r) {
+    const level = this.level.rotate(r)
+    this.setState({
+      level: {
+        ...this.state.level,
+        ...level
+      }
+    })
   }
 
   componentDidMount() {
@@ -90,11 +88,13 @@ class App extends Component {
   }
 
   render() {
+    const {level} = this.state
+
     const innerRadius = 90
     const cursorRadius = 10
     const padWidth = 5
     const padding = 5
-    const outerRadius = this.state.rings.length * (padWidth + padding) + innerRadius
+    const outerRadius = level.rings.length * (padWidth + padding) + innerRadius
     // 10 == cursor animation buffer
     const width = (outerRadius + (20 + cursorRadius) + padding) * 2
 
@@ -104,9 +104,9 @@ class App extends Component {
           <div id="board">
             <svg width={width} height={width}>
               <g transform={`translate(${width / 2}, ${width / 2})`}>
-                <g transform={`rotate(${-this.state.rotation})`}>
+                <g transform={`rotate(${-level.rotation})`}>
                   <Rings
-                    data={this.state.rings}
+                    data={level.rings}
                     padWidth={padWidth}
                     innerRadius={innerRadius}
                     padding={padding}
@@ -123,7 +123,7 @@ class App extends Component {
                   }}
                 />
 
-                <Motion defaultStyle={{offset: 10}} style={{offset: spring(this.state.offset)}}>
+                <Motion defaultStyle={{offset: 10}} style={{offset: spring(level.offset)}}>
                   {({offset}) => (
                     <g transform={`translate(0, -${outerRadius + cursorRadius + padding}) rotate(${offset}, ${0}, ${outerRadius + cursorRadius + padding})`}>
                       <circle className={classnames('cursor', {'bored': this.state.paused})} r={cursorRadius} style={{fill: this.state.gameOver? 'var(--error-color)' : 'var(--pad-color)'}}/>
@@ -134,9 +134,9 @@ class App extends Component {
             </svg>
 
             <div id="score">
-              lv. {this.state.ring}
+              lv. {level.ring}
               <br/>
-              {this.state.score}
+              {level.score}
             </div>
           </div>
 
@@ -152,7 +152,7 @@ class App extends Component {
           </div>
         </div>
 
-        <TouchControl disabled={this.state.gameOver || this.state.paused} value={this.state.rotation} onChange={(rotation) => this.setState({rotation})}></TouchControl>
+        <TouchControl disabled={this.state.gameOver || this.state.paused} value={level.rotation} onChange={(rotation) => this.rotate(rotation)}></TouchControl>
       </div>
     )
   }
