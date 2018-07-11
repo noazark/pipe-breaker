@@ -1,143 +1,88 @@
 import React, { Component } from 'react';
 import classnames from 'classnames'
-import {closest, setPlane} from './utils'
 import TouchControl from './TouchControl'
 import Rings from './Rings'
 import {Motion, spring} from 'react-motion'
 
+import survival from './levels/survival'
+
 import './App.css'
-
-function randomRing(num=1) {
-  const data = (new Array(10))
-    .fill(0)
-    .map(() => ({active: true, width: Math.ceil(Math.random() * 15) + 5}))
-  const speed = 1
-
-  return {
-    speed,
-    data
-  }
-}
 
 class App extends Component {
   constructor(props) {
     super(props)
 
+    this.gameOver = this.gameOver.bind(this)
     this.loop = this.loop.bind(this)
-    this.step = this.step.bind(this)
-    this.reset = this.reset.bind(this)
     this.pause = this.pause.bind(this)
     this.play = this.play.bind(this)
+    this.reset = this.reset.bind(this)
+    this.step = this.step.bind(this)
 
     this.loopID = null
-    this.t = 0
+    this.level = survival
 
     this.state = {
-      // ring state
-      rings: [],
-      rotation: 0,
-      offset: 0,
+      // level state
+      ...this.level.reset(this, this.state),
 
       // game state
+      t: 0,
       gameOver: false,
       paused: true,
-      score: 0,
-      ring: 1
     }
+  }
+
+  gameOver() {
+    window.cancelAnimationFrame(this.loopID)
+    this.loopID = null
+
+    this.setState({gameOver: true})
   }
 
   loop() {
-    this.t += 1
+    const t = this.state.t + 1
+    this.setState({t})
 
-    if (this.t % Math.round(60 * this.state.rings[0].speed) === 0) {
+    if (t % Math.round(60 * this.state.speed) === 0) {
       this.step()
     }
-  }
 
-  step() {
-    let {rings, offset, score, ring} = this.state
-
-    let rotation = this.state.rotation + offset
-
-    if (rotation < 0) {
-      rotation = 360 + (rotation % 360)
-    }
-    const c = closest(rings, rotation / 360 % 1)
-
-    if (c[0] !== -1) {
-      score += 1
-      rings = setPlane(rings, c, {active:false})
-
-      if (rings.some((ring) => ring.data.every((plane) => !plane.active))) {
-        // change rings
-        ring += 1
-        // reset time so the next play speed doesn't jump the screen
-        this.t = 0
-
-        // clean ring bonus
-        if (rings[0].data.every((plane) => !plane.active) && rings[1].data.every((plane) => plane.active)) {
-          score += 10
-        }
-
-        rings = rings.filter((ring) => ring.data.some((plane) => plane.active))
-        rings.push(randomRing(ring + 1))
-      }
-    } else {
-      this.setState({gameOver: true})
-      clearInterval(this.loopID)
-      return
-    }
-
-    // set offset for next cycle
-    const lastOffset = offset
-    offset = Math.random() * 360
-
-    // protect against offsets being too close together
-    if (Math.abs(offset - lastOffset) < 30) {
-      offset = lastOffset + 30
-    }
-
-    this.setState({rings, offset, score, ring})
-  }
-
-  reset() {
-    this.setState({
-      rotation: 0,
-      gameOver: false,
-      paused: true,
-      offset: null,
-      rings: [
-        {...randomRing(1), color: 'var(--pad-color)'},
-        {...randomRing(2), color: 'var(--pad-color)'},
-        {...randomRing(2), color: 'var(--pad-color)'},
-      ],
-      ring: 1,
-      score: 0
-    })
+    this.loopID = window.requestAnimationFrame(this.loop)
   }
 
   pause () {
     this.setState({paused: true})
 
     if (this.loopID) {
-      clearInterval(this.loopID)
+      window.cancelAnimationFrame(this.loopID)
     }
   }
 
   play () {
-    let offset = this.state.offset
+    const state = this.level.step(this, this.state, false)
 
-    if (offset == null) {
-      offset = Math.random() * 360
-    }
-
-    this.setState({paused: false, offset})
+    this.setState({...state, paused: false})
 
     if (this.loopID) {
-      clearInterval(this.loopID)
+      window.cancelAnimationFrame(this.loopID)
     }
 
-    this.loopID = setInterval(() => this.loop(), 15)
+    this.loop()
+  }
+
+  reset() {
+    const state = this.level.reset(this, this.state)
+    this.setState({
+      ...state,
+      gameOver: false,
+      paused: true,
+    })
+  }
+
+  step() {
+    const state = this.level.step(this, this.state)
+    this.setState(state)
   }
 
   componentDidMount() {
