@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import './Cursor.css';
+import './App.css';
 
-// Separate animated cursor component using hooks
 const AnimatedCursor = ({ theta, outerRadius, cursorRadius, padding, gameOver, paused }) => {
   // Calculate position using polar coordinates
   const radius = outerRadius + cursorRadius + padding;
@@ -12,13 +11,29 @@ const AnimatedCursor = ({ theta, outerRadius, cursorRadius, padding, gameOver, p
     transition: 'transform 0.2s ease-out',
   });
 
+  // State to keep track of the previous angle
+  const [prevTheta, setPrevTheta] = useState(0);
+
+  // Function to calculate the shortest angular distance
+  const calculateShortestAngle = (from, to) => {
+    let delta = to - from;
+    if (delta > 180) delta -= 360;
+    if (delta < -180) delta += 360;
+    return delta;
+  };
+
   // Update the transform style after the component mounts
   useEffect(() => {
+    const shortestAngle = calculateShortestAngle(prevTheta, theta);
+    const newTheta = prevTheta + shortestAngle;
+
     setTransformStyle({
-      transform: `rotate(${theta}deg) translate(0, -${radius}px)`,
+      transform: `rotate(${newTheta}deg) translate(0, -${radius}px)`,
       transition: 'transform 0.2s ease-out',
     });
-  }, [theta, radius]);
+
+    setPrevTheta(newTheta);
+  }, [theta, radius, prevTheta]);
 
   return (
     <g style={transformStyle}>

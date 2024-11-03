@@ -112,8 +112,6 @@ class App extends Component {
 
               <circle
                 onClick={this.reset}
-                className="top"
-                mask="url(#ring-mask)"
                 r={innerRadius}
                 style={{
                   fill: this.state.gameOver ? 'var(--error-color)' : 'var(--pad-color)',
