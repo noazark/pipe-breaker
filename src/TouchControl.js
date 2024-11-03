@@ -1,6 +1,6 @@
 import {Component} from 'react'
 
-export default class extends Component {
+class TouchControl extends Component {
   constructor(props) {
     super(props)
 
@@ -68,3 +68,5 @@ export default class extends Component {
     return null
   }
 }
+
+export default TouchControl

@@ -10,7 +10,7 @@ function randomRing() {
   }
 }
 
-export default {
+const SurvivalMode = {
   reset(ctx, state) {
     return {
       rotation: 0,
@@ -88,3 +88,5 @@ export default {
     return {rings, offset, score, ring, speed, t, rotation}
   }
 }
+
+export default SurvivalMode
