@@ -99,7 +99,7 @@ class App extends Component {
     return (
       <div id="game">
         <div id="board">
-          <svg width={width} height={width}>
+          <svg id="field" width={width} height={width}>
             <g transform={`translate(${width / 2}, ${width / 2})`}>
               <g transform={`rotate(${-level.rotation})`}>
                 <Rings
@@ -153,8 +153,8 @@ class App extends Component {
           value={level.rotation}
           onChange={(rotation) => this.rotate(rotation)}
         />
+        <div id="version">Version: {process.env.REACT_APP_VERSION}</div>
       </div>
-
     );
   }
 }
