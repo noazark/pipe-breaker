@@ -7,8 +7,7 @@ const AnimatedCursor = ({ theta, outerRadius, cursorRadius, padding, gameOver, p
 
   // State to manage the transform style
   const [transformStyle, setTransformStyle] = useState({
-    transform: `rotate(0deg) translate(0, -${radius}px)`,
-    transition: 'transform 0.2s ease-out',
+    transform: `rotate(0deg) translate(0, -${radius}px)`
   });
 
   // State to keep track of the previous angle
@@ -28,15 +27,14 @@ const AnimatedCursor = ({ theta, outerRadius, cursorRadius, padding, gameOver, p
     const newTheta = prevTheta + shortestAngle;
 
     setTransformStyle({
-      transform: `rotate(${newTheta}deg) translate(0, -${radius}px)`,
-      transition: 'transform 0.2s ease-out',
+      transform: `rotate(${newTheta}deg) translate(0, -${radius}px)`
     });
 
     setPrevTheta(newTheta);
   }, [theta, radius, prevTheta]);
 
   return (
-    <g style={transformStyle}>
+    <g style={{...transformStyle, transition: 'transform 0.2s ease-out'}}>
       <circle
         className={`cursor ${paused ? 'bored' : ''}`}
         r={cursorRadius}
