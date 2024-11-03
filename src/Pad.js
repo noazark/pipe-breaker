@@ -1,7 +1,7 @@
 import React from 'react'
 import {findStartPos, findEndPos, describeArc} from './utils'
 
-export default function Pad (props) {
+export default function Pad(props) {
   const {
     ring,
     pad,

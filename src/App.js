@@ -97,66 +97,64 @@ class App extends Component {
     const width = (outerRadius + (20 + cursorRadius) + padding) * 2;
 
     return (
-      <div id="page">
-        <div id="game">
-          <div id="board">
-            <svg width={width} height={width}>
-              <g transform={`translate(${width / 2}, ${width / 2})`}>
-                <g transform={`rotate(${-level.rotation})`}>
-                  <Rings
-                    data={level.rings}
-                    padWidth={padWidth}
-                    innerRadius={innerRadius}
-                    padding={padding}
-                  />
-                </g>
-
-                <circle
-                  onClick={this.reset}
-                  className="top"
-                  mask="url(#ring-mask)"
-                  r={innerRadius}
-                  style={{
-                    fill: this.state.gameOver ? 'var(--error-color)' : 'var(--pad-color)',
-                  }}
-                />
-
-                <AnimatedCursor
-                  theta={level.offset}
-                  outerRadius={outerRadius}
-                  cursorRadius={cursorRadius}
+      <div id="game">
+        <div id="board">
+          <svg width={width} height={width}>
+            <g transform={`translate(${width / 2}, ${width / 2})`}>
+              <g transform={`rotate(${-level.rotation})`}>
+                <Rings
+                  data={level.rings}
+                  padWidth={padWidth}
+                  innerRadius={innerRadius}
                   padding={padding}
-                  gameOver={this.state.gameOver}
-                  paused={this.state.paused}
                 />
               </g>
-            </svg>
 
-            <div id="score">
-              lv. {level.ring}
-              <br/>
-              {level.score}
-            </div>
-          </div>
+              <circle
+                onClick={this.reset}
+                className="top"
+                mask="url(#ring-mask)"
+                r={innerRadius}
+                style={{
+                  fill: this.state.gameOver ? 'var(--error-color)' : 'var(--pad-color)',
+                }}
+              />
 
-          <div id="controls">
-            <button
-              className={
-                classnames('btn', this.state.paused ? 'btn-play' : this.state.gameOver ? 'btn-reset' : 'btn-pause')
-              }
-              onClick={this.state.paused ? this.play : this.state.gameOver ? this.reset : this.pause}
-            >
-              {this.state.paused ? 'play' : this.state.gameOver ? 'reset' : 'pause'}
-            </button>
+              <AnimatedCursor
+                theta={level.offset}
+                outerRadius={outerRadius}
+                cursorRadius={cursorRadius}
+                padding={padding}
+                gameOver={this.state.gameOver}
+                paused={this.state.paused}
+              />
+            </g>
+          </svg>
+
+          <div id="score">
+            lv. {level.ring}
+            <br/>
+            {level.score}
           </div>
         </div>
 
+        <div id="controls">
+          <button
+            className={
+              classnames('btn', this.state.paused ? 'btn-play' : this.state.gameOver ? 'btn-reset' : 'btn-pause')
+            }
+            onClick={this.state.paused ? this.play : this.state.gameOver ? this.reset : this.pause}
+          >
+            {this.state.paused ? 'play' : this.state.gameOver ? 'reset' : 'pause'}
+          </button>
+        </div>
         <TouchControl
           disabled={this.state.gameOver || this.state.paused}
           value={level.rotation}
           onChange={(rotation) => this.rotate(rotation)}
         />
       </div>
+
     );
   }
 }

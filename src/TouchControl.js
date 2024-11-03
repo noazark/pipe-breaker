@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 
-const TouchControl = ({ disabled, value, onChange }) => {
+export default function TouchControl({ disabled, value, onChange }) {
   const centerX = 187.5;
   const centerY = 333.5;
   const [lastValue, setLastValue] = useState(0);
@@ -43,5 +43,3 @@ const TouchControl = ({ disabled, value, onChange }) => {
 
   return null;
 };
-
-export default TouchControl;
