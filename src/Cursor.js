@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
+import './Cursor.css';
 
 const AnimatedCursor = ({ theta, outerRadius, cursorRadius, padding, gameOver, paused }) => {
   // Calculate position using polar coordinates
