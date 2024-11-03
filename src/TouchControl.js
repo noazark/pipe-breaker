@@ -1,72 +1,47 @@
-import {Component} from 'react'
+import { useEffect, useState, useCallback } from 'react';
 
-class TouchControl extends Component {
-  constructor(props) {
-    super(props)
+const TouchControl = ({ disabled, value, onChange }) => {
+  const centerX = 187.5;
+  const centerY = 333.5;
+  const [lastValue, setLastValue] = useState(0);
 
-    this.onTouchStart = this.onTouchStart.bind(this)
-    this.onTouchMove = this.onTouchMove.bind(this)
-    this.onTouchEnd = this.onTouchEnd.bind(this)
+  const getRotation = useCallback((e) => {
+    return -Math.atan2(e.touches[0].pageY - centerY, e.touches[0].pageX - centerX) * 180 * 4 / Math.PI;
+  }, [centerX, centerY]);
 
-    this.centerX = 187.5
-    this.centerY = 333.5
+  const onTouchStart = useCallback((e) => {
+    const rotationValue = getRotation(e);
+    setLastValue((prevLastValue) => prevLastValue - rotationValue);
+  }, [getRotation]);
 
-    this.state = {
-      lastValue: 0
+  const onTouchEnd = useCallback(() => {
+    setLastValue(value);
+  }, [value]);
+
+  const onTouchMove = useCallback((e) => {
+    const rotationValue = getRotation(e);
+    onChange(rotationValue + lastValue);
+  }, [getRotation, lastValue, onChange]);
+
+  useEffect(() => {
+    if (!disabled) {
+      document.addEventListener('touchstart', onTouchStart, { passive: true });
+      document.addEventListener('touchend', onTouchEnd, { passive: true });
+      document.addEventListener('touchmove', onTouchMove, { passive: true });
+    } else {
+      document.removeEventListener('touchstart', onTouchStart);
+      document.removeEventListener('touchend', onTouchEnd);
+      document.removeEventListener('touchmove', onTouchMove);
     }
-  }
 
-  enableTouch() {
-    document.addEventListener('touchstart', this.onTouchStart, { passive: true })
-    document.addEventListener('touchend', this.onTouchEnd, { passive: true })
-    document.addEventListener('touchmove', this.onTouchMove, { passive: true })
-  }
+    return () => {
+      document.removeEventListener('touchstart', onTouchStart);
+      document.removeEventListener('touchend', onTouchEnd);
+      document.removeEventListener('touchmove', onTouchMove);
+    };
+  }, [disabled, onTouchStart, onTouchEnd, onTouchMove]);
 
-  disableTouch() {
-    document.removeEventListener('touchstart', this.onTouchStart)
-    document.removeEventListener('touchend', this.onTouchEnd)
-    document.removeEventListener('touchmove', this.onTouchMove)
-  }
+  return null;
+};
 
-  componentDidMount() {
-    if (!this.props.disabled) {
-      this.enableTouch()
-    }
-  }
-
-  componentWillUnmount() {
-    this.disableTouch()
-  }
-
-  componentWillUpdate(nextProps) {
-    if (!this.props.disabled && nextProps.disabled) {
-      this.disableTouch()
-    } else if (this.props.disabled && !nextProps.disabled) {
-      this.enableTouch()
-    }
-  }
-
-  getRotation(e) {
-    return -Math.atan2(e.touches[0].pageY - this.centerY, e.touches[0].pageX - this.centerX) * 180 * 4 / Math.PI;
-  }
-
-  onTouchStart(e) {
-    const value = this.getRotation(e)
-    this.setState({lastValue: this.state.lastValue - value})
-  }
-
-  onTouchEnd(e) {
-    this.setState({lastValue: this.props.value})
-  }
-
-  onTouchMove(e) {
-    const value = this.getRotation(e)
-    this.props.onChange(value + this.state.lastValue)
-  }
-
-  render () {
-    return null
-  }
-}
-
-export default TouchControl
+export default TouchControl;
