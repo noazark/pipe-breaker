@@ -3,7 +3,7 @@ import classnames from 'classnames';
 import AnimatedCursor from './Cursor';
 import TouchControl from './TouchControl';
 import Rings from './Rings';
-import survival from './levels/survival';
+import survival from './levels/survival.ts';
 import './App.css';
 
 class App extends Component {

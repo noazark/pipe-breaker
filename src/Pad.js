@@ -1,5 +1,5 @@
 import React from 'react'
-import {findStartPos, findEndPos, describeArc} from './utils'
+import { findStartPos, findEndPos, describeArc } from './utils'
 
 export default function Pad(props) {
   const {
@@ -16,5 +16,5 @@ export default function Pad(props) {
   const endAngle = 360 * findEndPos(ring, idx)
   const path = describeArc(innerRadius, outerRadius, startAngle, endAngle, padding)
 
-  return pad.active ? <path className=".pad" d={path} fill="var(--pad-color)" /> : null
+  return pad.active ? <path className=".pad" d={path} fill={pad.color || ring.color || 'var(--pad-color)'} /> : null
 }

@@ -1,24 +1,35 @@
-import {closest, setPlane} from '../utils'
+import { Context } from 'vm';
+import { closest, setPlane } from '../utils'
+import { Ring, State } from './types';
 
-function randomRing() {
+function randomRing(): Ring {
   const data = (new Array(10))
     .fill(0)
-    .map(() => ({active: true, width: Math.ceil(Math.random() * 15) + 5}))
+    .map(() => ({
+      active: true,
+      width: Math.ceil(Math.random() * 15) + 5,
+    }))
 
   return {
     data
   }
 }
 
-const SurvivalMode = {
-  reset(ctx, state) {
+interface GameModeType {
+  reset: (ctx: Context, state: State) => State;
+  rotate: (r: number) => { rotation: number };
+  step: (ctx: Context, state: State, kill?: boolean) => State;
+}
+
+const SurvivalMode: GameModeType = {
+  reset(_ctx, _state) {
     return {
       rotation: 0,
       offset: null,
       rings: [
-        {...randomRing(), color: 'var(--pad-color)'},
-        {...randomRing(), color: 'var(--pad-color)'},
-        {...randomRing(), color: 'var(--pad-color)'},
+        randomRing(),
+        randomRing(),
+        randomRing(),
       ],
       ring: 1,
       score: 0,
@@ -28,11 +39,11 @@ const SurvivalMode = {
   },
 
   rotate(r) {
-    return {rotation: r}
+    return { rotation: r }
   },
 
-  step(ctx, state, kill=true) {
-    let {speed, rings, offset, score, ring, t, rotation} = state
+  step(ctx, state, kill = true) {
+    let { speed, rings, offset, score, ring, t, rotation } = state
 
     if (offset == null) {
       offset = Math.random() * 360
@@ -41,7 +52,7 @@ const SurvivalMode = {
     t += 1
 
     if (t % Math.round(60 * speed) === 0) {
-      // reset timer to prevent gliches when changing speed
+      // reset timer to prevent glitches when changing speed
       t = 0
 
       let _r = rotation + offset
@@ -55,7 +66,7 @@ const SurvivalMode = {
 
         if (c[0] !== -1) {
           score += 1
-          rings = setPlane(rings, c, {active:false})
+          rings = setPlane(rings, c, { active: false })
 
           if (rings.some((ring) => ring.data.every((plane) => !plane.active))) {
             // change rings
@@ -67,7 +78,7 @@ const SurvivalMode = {
             }
 
             rings = rings.filter((ring) => ring.data.some((plane) => plane.active))
-            rings.push(randomRing(ring + 1))
+            rings.push(randomRing())
           }
         } else {
           ctx.gameOver()
@@ -85,7 +96,7 @@ const SurvivalMode = {
       }
     }
 
-    return {rings, offset, score, ring, speed, t, rotation}
+    return { rings, offset, score, ring, speed, t, rotation }
   }
 }
 
