@@ -33,9 +33,22 @@ jobs:
 
     - run: npm ci
 
-    - run: npm run build
+    - name: Generate Version
+      id: generate_version
+      run: |
+        DATE=$(date +'%Y.%m')
+        HASH=$(git rev-parse --short HEAD)
+        VERSION="$DATE.$HASH"
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "Generated version: $VERSION"
 
-    - run: npm test
+    - name: Build Project
+      run: npm run build
+      env:
+        REACT_APP_VERSION: ${{ env.VERSION }}
+
+    - name: Run Tests
+      run: npm test
 
     - name: Setup Pages
       uses: actions/configure-pages@v5
@@ -43,7 +56,6 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        # Upload entire repository
         path: 'build/'
 
     - name: Deploy to GitHub Pages
