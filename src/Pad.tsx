@@ -1,7 +1,16 @@
 import React from 'react'
-import { findStartPos, findEndPos, describeArc } from './utils'
+import { findStartPos, findEndPos, describeArc } from './utils.ts'
+import { Ring, RingPad } from './levels/types';
 
-export default function Pad(props) {
+interface PadProps {
+  ring: Ring;
+  pad: RingPad;
+  idx: number;
+  padWidth: number;
+  padding: number;
+  innerRadius: number;
+}
+export default function Pad(props: PadProps) {
   const {
     ring,
     pad,

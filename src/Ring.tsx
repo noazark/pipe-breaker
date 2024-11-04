@@ -1,5 +1,5 @@
 import React from 'react'
-import Pad from './Pad'
+import Pad from './Pad.tsx'
 
 export default function Ring (props) {
   const {

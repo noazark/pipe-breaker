@@ -1,5 +1,5 @@
 import React from 'react';
-import Ring from './Ring';
+import Ring from './Ring.tsx';
 
 const Rings = ({ data, padWidth, innerRadius, padding }) => {
   const ringCount = data.length;

@@ -1,6 +1,5 @@
-import { Context } from 'vm';
-import { closest, setPlane } from '../utils'
-import { Ring, State } from './types';
+import { closest, setPlane } from '../utils.ts'
+import { GameModeType, Ring } from './types.ts';
 
 function randomRing(): Ring {
   const data = (new Array(10))
@@ -15,12 +14,6 @@ function randomRing(): Ring {
   }
 }
 
-interface GameModeType {
-  reset: (ctx: Context, state: State) => State;
-  rotate: (r: number) => { rotation: number };
-  step: (ctx: Context, state: State, kill?: boolean) => State;
-}
-
 const SurvivalMode: GameModeType = {
   reset(_ctx, _state) {
     return {
@@ -31,8 +24,8 @@ const SurvivalMode: GameModeType = {
         randomRing(),
         randomRing(),
       ],
-      ring: 1,
       score: 0,
+      currentLevel: 1,
       speed: 1,
       t: 0
     }
@@ -43,7 +36,7 @@ const SurvivalMode: GameModeType = {
   },
 
   step(ctx, state, kill = true) {
-    let { speed, rings, offset, score, ring, t, rotation } = state
+    let { speed, rings, offset, score, currentLevel, t, rotation } = state
 
     if (offset == null) {
       offset = Math.random() * 360
@@ -69,13 +62,12 @@ const SurvivalMode: GameModeType = {
           rings = setPlane(rings, c, { active: false })
 
           if (rings.some((ring) => ring.data.every((plane) => !plane.active))) {
-            // change rings
-            ring += 1
-
             // clean ring bonus
             if (rings[0].data.every((plane) => !plane.active) && rings[1].data.every((plane) => plane.active)) {
               score += 10
             }
+
+            currentLevel += 1
 
             rings = rings.filter((ring) => ring.data.some((plane) => plane.active))
             rings.push(randomRing())
@@ -96,7 +88,7 @@ const SurvivalMode: GameModeType = {
       }
     }
 
-    return { rings, offset, score, ring, speed, t, rotation }
+    return { rings, offset, score, currentLevel, speed, t, rotation }
   }
 }
 

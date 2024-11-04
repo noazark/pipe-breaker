@@ -1,13 +1,28 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import AnimatedCursor from './Cursor';
-import TouchControl from './TouchControl';
-import Rings from './Rings';
+import AnimatedCursor from './Cursor.tsx';
+import TouchControl from './TouchControl.tsx';
+import Rings from './Rings.tsx';
 import survival from './levels/survival.ts';
 import './App.css';
 
-class App extends Component {
-  constructor(props) {
+interface Level {
+  step: (ctx: any, state: any) => any;
+  reset: (ctx: any, state: any) => any;
+  rotate: (r: number) => any;
+}
+
+interface AppState {
+  level: any;
+  gameOver: boolean;
+  paused: boolean;
+}
+
+class App extends Component<{}, AppState> {
+  loopID: number | null = null;
+  level: Level = survival;
+
+  constructor(props: {}) {
     super(props);
 
     this.gameOver = this.gameOver.bind(this);
@@ -15,22 +30,17 @@ class App extends Component {
     this.pause = this.pause.bind(this);
     this.play = this.play.bind(this);
     this.reset = this.reset.bind(this);
-
-    this.loopID = null;
-    this.level = survival;
+    this.rotate = this.rotate.bind(this);
 
     this.state = {
-      // level state
-      level: this.level.reset(this, this.state),
-
-      // game state
+      level: this.level.reset(this, {}),
       gameOver: false,
       paused: true,
     };
   }
 
   gameOver() {
-    window.cancelAnimationFrame(this.loopID);
+    if (this.loopID) window.cancelAnimationFrame(this.loopID);
     this.loopID = null;
 
     this.setState({ gameOver: true });
@@ -63,7 +73,7 @@ class App extends Component {
   }
 
   reset() {
-    const level = this.level.reset(this, this.state);
+    const level = this.level.reset(this, {});
     this.setState({
       level,
       gameOver: false,
@@ -71,13 +81,13 @@ class App extends Component {
     });
   }
 
-  rotate(r) {
+  rotate(r: number) {
     const level = this.level.rotate(r);
     this.setState({
       level: {
         ...this.state.level,
-        ...level
-      }
+        ...level,
+      },
     });
   }
 
@@ -87,13 +97,13 @@ class App extends Component {
 
   render() {
     const { level } = this.state;
+    const gameVersion = process.env.REACT_APP_GAME_VERSION;
 
     const innerRadius = 90;
     const cursorRadius = 10;
     const padWidth = 5;
     const padding = 5;
     const outerRadius = level.rings.length * (padWidth + padding) + innerRadius;
-    // 10 == cursor animation buffer
     const width = (outerRadius + (20 + cursorRadius) + padding) * 2;
 
     return (
@@ -112,6 +122,8 @@ class App extends Component {
 
               <circle
                 onClick={this.reset}
+                className="top"
+                mask="url(#ring-mask)"
                 r={innerRadius}
                 style={{
                   fill: this.state.gameOver ? 'var(--error-color)' : 'var(--pad-color)',
@@ -130,17 +142,15 @@ class App extends Component {
           </svg>
 
           <div id="score">
-            lv. {level.ring}
-            <br/>
+            lv. {level.currentLevel}
+            <br />
             {level.score}
           </div>
         </div>
 
         <div id="controls">
           <button
-            className={
-              classnames('btn', this.state.paused ? 'btn-play' : this.state.gameOver ? 'btn-reset' : 'btn-pause')
-            }
+            className={classnames('btn', this.state.paused ? 'btn-play' : this.state.gameOver ? 'btn-reset' : 'btn-pause')}
             onClick={this.state.paused ? this.play : this.state.gameOver ? this.reset : this.pause}
           >
             {this.state.paused ? 'play' : this.state.gameOver ? 'reset' : 'pause'}
@@ -151,7 +161,10 @@ class App extends Component {
           value={level.rotation}
           onChange={(rotation) => this.rotate(rotation)}
         />
-        <div id="version">Version: {process.env.REACT_APP_VERSION}</div>
+
+        <div id="version" style={{ textAlign: 'center', marginTop: '20px' }}>
+          Version: {gameVersion}
+        </div>
       </div>
     );
   }
