@@ -97,7 +97,7 @@ class App extends Component<{}, AppState> {
 
   render() {
     const { level } = this.state;
-    const gameVersion = process.env.REACT_APP_GAME_VERSION;
+    const gameVersion = process.env.REACT_APP_VERSION;
 
     const innerRadius = 90;
     const cursorRadius = 10;
